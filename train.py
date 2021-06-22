@@ -4,6 +4,7 @@ from transformers import (AdamW,
                           BertModel,
                           get_linear_schedule_with_warmup)
 import torch.nn as nn
+from sklearn.metrics import hamming_loss
 
 class BERT(tez.Model):
   def __init__(self, no_train_steps, num_classes = 11, lr = 1e-4):
@@ -40,7 +41,15 @@ class BERT(tez.Model):
         ) 
   
   def losses(self, out, targets):
-    return nn.CrossEntropyLoss()(out, targets)
+    return nn.BCEWithLogitsLoss()(out, targets)
+
+  def monitor_metrics(self, outputs, targets):
+    targets = torch.argmax(targets, axis=1).cpu().detach().numpy()
+    outputs = torch.argmax(outputs, axis=1).cpu().detach().numpy()
+    
+    return {
+      "accuracy":hamming_loss(targets, outputs)
+    }
 
   def forward(self, ids, mask, token_type_ids, targets = None):
     _,x = self.bert(ids, attention_mask = mask, token_type_ids = token_type_ids)
@@ -48,7 +57,9 @@ class BERT(tez.Model):
 
     if targets is not None:
       loss = self.losses(x, targets)
-      return x, loss
-    return x, 0 
+      metrics = self.monitor_metrics(x, targets)
+      return x, loss, metrics
+    return x, 0, {}
+
 
 
