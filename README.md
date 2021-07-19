@@ -5,7 +5,7 @@ Only if transformers had longer sequence length, the world would have been a bet
 `dataset.py` and `train.py` is pretty general for any kind of BERT fine-tuning task. Change the model and <br>
 and you are good to go.
 
-Hardcoded `main.py` cause I was lazy. Feel free get inspored and change as required.
+Hardcoded `main.py` cause I was lazy. Feel free get inspired and change as required.
 
 # How to run?
 
